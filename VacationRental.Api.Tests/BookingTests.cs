@@ -35,5 +35,14 @@ namespace VacationRental.Api.Tests
 
             Assert.False(booking.DateIsBooked(dateToCheck));
         }
+
+        [Fact]
+        public void GivenDateIsPreparationDate_ThenShouldReturnTrue()
+        {
+            var booking = new Booking() { StartDate = new DateTime(2000, 01, 01), Nights = 2 ,PreparationDays=1};
+            var dateToCheck = new DateTime(2000, 01, 03);
+
+            Assert.True(booking.DateIsBooked(dateToCheck));
+        }
     }
 }

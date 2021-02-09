@@ -47,7 +47,8 @@ namespace VacationRental.Api.Controllers
                 Id = key.Id,
                 Nights = model.Nights,
                 RentalId = model.RentalId,
-                StartDate = model.Start.Date
+                StartDate = model.Start.Date,
+                PreparationDays = _rentals[model.RentalId].PreparationTimeInDays
             };
 
             if (IsOverbooking(booking))
