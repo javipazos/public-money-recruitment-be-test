@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
 
@@ -9,12 +10,12 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
+        private readonly IDictionary<int, Rental> _rentals;
+        private readonly IDictionary<int, Booking> _bookings;
 
         public CalendarController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+            IDictionary<int, Rental> rentals,
+            IDictionary<int, Booking> bookings)
         {
             _rentals = rentals;
             _bookings = bookings;
@@ -28,11 +29,14 @@ namespace VacationRental.Api.Controllers
             if (!_rentals.ContainsKey(rentalId))
                 throw new ApplicationException("Rental not found");
 
-            var result = new CalendarViewModel 
+            var result = new CalendarViewModel
             {
                 RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>() 
+                Dates = new List<CalendarDateViewModel>()
             };
+
+            var rentalBookings = _bookings.Values.Where(b => b.RentalId == rentalId);
+
             for (var i = 0; i < nights; i++)
             {
                 var date = new CalendarDateViewModel
@@ -41,14 +45,14 @@ namespace VacationRental.Api.Controllers
                     Bookings = new List<CalendarBookingViewModel>()
                 };
 
-                foreach (var booking in _bookings.Values)
-                {
-                    if (booking.RentalId == rentalId
-                        && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
+                foreach (var booking in rentalBookings)
+                { 
+                    if (booking.DateIsBooked(date.Date))
                     {
                         date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id });
                     }
                 }
+
 
                 result.Dates.Add(date);
             }

@@ -9,9 +9,9 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
+        private readonly IDictionary<int, Rental> _rentals;
 
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        public RentalsController(IDictionary<int, Rental> rentals)
         {
             _rentals = rentals;
         }
@@ -23,7 +23,7 @@ namespace VacationRental.Api.Controllers
             if (!_rentals.ContainsKey(rentalId))
                 throw new ApplicationException("Rental not found");
 
-            return _rentals[rentalId];
+            return new RentalViewModel(_rentals[rentalId]);
         }
 
         [HttpPost]
@@ -31,12 +31,8 @@ namespace VacationRental.Api.Controllers
         {
             var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
 
-            _rentals.Add(key.Id, new RentalViewModel
-            {
-                Id = key.Id,
-                Units = model.Units
-            });
-
+            var rental = new Rental(key.Id, model.Units);
+            _rentals.Add(rental.Id,rental);
             return key;
         }
     }
