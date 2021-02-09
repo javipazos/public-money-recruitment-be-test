@@ -8,7 +8,7 @@ namespace VacationRental.Api.Models
         public int RentalId { get; set; }
         public int UnitId { get; set; }
         public DateTime StartDate { get; set; }
-        public int Nights { get; set; }
+        public int Nights { get; set; }=1;
         public int PreparationDays { get; set; }
         public DateTime EndDate => StartDate.AddDays(Nights + PreparationDays);
 

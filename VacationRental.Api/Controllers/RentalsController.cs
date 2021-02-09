@@ -32,6 +32,7 @@ namespace VacationRental.Api.Controllers
             var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
 
             var rental = new Rental(key.Id, model.Units);
+            rental.PreparationTimeInDays=model.PreparationTimeInDays;
             _rentals.Add(rental.Id,rental);
             return key;
         }

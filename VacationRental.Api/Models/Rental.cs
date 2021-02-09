@@ -19,5 +19,6 @@ namespace VacationRental.Api.Models
 
         public List<Unit> Units { get; set; }
         public int Id { get; internal set; }
+        public int PreparationTimeInDays { get; set; }
     }
 }
