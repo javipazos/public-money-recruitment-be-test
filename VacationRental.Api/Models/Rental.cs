@@ -11,7 +11,7 @@ namespace VacationRental.Api.Models
         {
             Id = id;
             Units = new List<Unit>();
-            for (int i = 0; i < units; i++)
+            for (int i = 1; i <= units; i++)
             {
                 Units.Add(new Unit(i));
             }

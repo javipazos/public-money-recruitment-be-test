@@ -42,14 +42,17 @@ namespace VacationRental.Api.Controllers
                 var date = new CalendarDateViewModel
                 {
                     Date = start.Date.AddDays(i),
-                    Bookings = new List<CalendarBookingViewModel>()
+                    Bookings = new List<CalendarBookingViewModel>(),
+                    PreparationTimes = new List<CalendarBookingViewModel>()
                 };
 
                 foreach (var booking in rentalBookings)
                 { 
                     if (booking.DateIsBooked(date.Date))
                     {
-                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id });
+                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id, Unit = booking.UnitId });
+                    }else if (booking.DateIsPeparationDay(date.Date)){
+                        date.PreparationTimes.Add(new CalendarBookingViewModel { Id = booking.Id, Unit = booking.UnitId });
                     }
                 }
 

@@ -51,29 +51,32 @@ namespace VacationRental.Api.Controllers
                 PreparationDays = _rentals[model.RentalId].PreparationTimeInDays
             };
 
-            if (IsOverbooking(booking))
+            int? unitId = GetFreeUnitId(booking);
+            if (unitId is null)
                 throw new ApplicationException("Not available");
-
+            booking.UnitId= (int)unitId;
             _bookings.Add(key.Id, booking);
 
             return key;
         }
 
-        private bool IsOverbooking(Booking booking)
-        {
-            var overlaps = _bookings.Values.Where(b => b.RentalId == booking.RentalId &&
-                NewBookingOverlapsExisting(booking, b))
-                .Count();
 
-            return overlaps >= _rentals[booking.RentalId].Units.Count;
+        private int? GetFreeUnitId(Booking booking)
+        {
+            var rental = _rentals[booking.RentalId];
+            var occuppiedUnitIds = new List<int>();
+            foreach (var unit in rental.Units)
+            {
+                occuppiedUnitIds.AddRange(_bookings.Values.Where(b => b.UnitId == unit.Id && NewBookingOverlapsExisting(booking, b) ).Select(b => b.UnitId));
+            }
+
+            return rental.Units.FirstOrDefault(u=>!occuppiedUnitIds.Contains(u.Id))?.Id;
         }
 
         private static bool NewBookingOverlapsExisting(Booking newBooking, Booking existingBooking)
         {
             return existingBooking.RentalId == newBooking.RentalId
-                                    && (existingBooking.StartDate <= newBooking.StartDate && existingBooking.EndDate > newBooking.StartDate.Date)
-                                    || (existingBooking.StartDate < newBooking.EndDate && existingBooking.EndDate >= newBooking.EndDate)
-                                    || (existingBooking.StartDate > newBooking.StartDate && existingBooking.EndDate < newBooking.EndDate);
+                && existingBooking.DateRangesOverlaps(existingBooking.StartDate, existingBooking.EndDate, newBooking.StartDate, newBooking.EndDate);
         }
     }
 }
